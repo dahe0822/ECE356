@@ -13,13 +13,12 @@ app.listen(port, () => console.log(`Listening on port ${port}`));
 //MySQL Setup Connection
 //------------------------------------------------------------------------------
 var pool = mysql.createPool({
-    // connectionLimit: 10,
-    host: 'localhost',
-    authPlugins: 'mysql_native_password'
-    // user: process.env.REACT_APP_USER,
-    // password: process.env.REACT_APP_PASSWORD,
-    // database: process.env.REACT_APP_DBNAME,
-    // insecureAuth: true
+    connectionLimit: 10,
+    host: process.env.REACT_APP_HOST,
+    user: process.env.REACT_APP_USER,
+    password: process.env.REACT_APP_PASSWORD,
+    database: process.env.REACT_APP_DBNAME,
+    insecureAuth: true
 });
 
 pool.getConnection((err, connection) => {
@@ -35,10 +34,6 @@ pool.getConnection((err, connection) => {
         }
         throw new Error(err);
     }
-    console.log(pool);
-    pool.query('SELECT * FROM `posts`', function(err, result, fields) {
-        if (err) throw new Error(err);
-    });
     if (connection) connection.release();
     return;
 });
@@ -53,11 +48,20 @@ app.post('/api/users', (req, res) => {
     const birthday = new Date();
 
     let query = pool.query(
-        'INSERT INTO `users` SET ?',
-        {
-            username,
-            birthday
-        },
+        'INSERT INTO `Users` SET ?',
+        { username, birthday },
+        function(err, result, fields) {
+            if (err) throw new Error(err);
+            res.send(result);
+        }
+    );
+});
+
+//Get User by username
+app.get('/api/users/:username', (req, res) => {
+    pool.query(
+        'SELECT * FROM `Users` WHERE username = ? ',
+        [req.params.username],
         function(err, result, fields) {
             if (err) throw new Error(err);
             res.send(result);
@@ -70,8 +74,8 @@ app.post('/api/posts', (req, res) => {
     const { author_id, title, content_body } = req.body;
     const created_at = new Date();
     pool.query(
-        'INSERT INTO `posts` (author_id, title, content_body, created_at) VALUES ?',
-        [[author_id, title, content_body, created_at]],
+        'INSERT INTO `Posts` SET ?',
+        { author_id, title, content_body, created_at },
         function(err, result, fields) {
             if (err) throw new Error(err);
             res.send(result);
@@ -81,7 +85,7 @@ app.post('/api/posts', (req, res) => {
 
 //View list of posts
 app.get('/api/posts', (req, res) => {
-    pool.query('SELECT * FROM `posts`', function(err, result, fields) {
+    pool.query('SELECT * FROM `Posts`', function(err, result, fields) {
         if (err) throw new Error(err);
         res.send(result);
     });
@@ -90,8 +94,8 @@ app.get('/api/posts', (req, res) => {
 //View one post
 app.get('/api/posts/:postId', (req, res) => {
     pool.query(
-        'SELECT * FROM `posts` WHERE postId = ? ',
-        [req.params.userId],
+        'SELECT * FROM `Posts` WHERE post_id = ? ',
+        [req.params.postId],
         function(err, result, fields) {
             if (err) throw new Error(err);
             res.send(result);
