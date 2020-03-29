@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import NavigationBar from './NavigationBar'
+import '../stylesheets/home.css';
 
-const Home = () => {
+const Home = (props) => {
     const [data, setData] = useState({ posts: [] });
 
     useEffect(() => {
@@ -20,20 +22,36 @@ const Home = () => {
     }, [data]);
 
     const listOfPosts = data.posts.map(function(post) {
-        const { post_id, author_id, title, content_body, created_at } = post;
+        const { post_id, username, title, created_at } = post;
         return (
-            <li>
-                {' '}
-                PostId {post_id}, AuthorId {author_id}, title {title},
-                content_body {content_body}, created at {created_at}{' '}
-            </li>
+            <tr key={ post_id }>
+                <td>{ username } </td>
+                <td className="post-list-title">{ title } </td>
+                <td>{ created_at } </td>                
+            </tr>
         );
     });
 
     return (
         <>
-            <h1> List of Posts </h1>
-            <ul>{listOfPosts}</ul>
+            <NavigationBar
+                username={props.user.username}
+            />
+            <div className="container">
+            <h2>Post List</h2>
+            <table className="table">
+                <thead>
+                <tr>
+                    <th>username</th>
+                    <th className="post-list-title">title</th>
+                    <th>created at</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {listOfPosts}
+                </tbody>
+            </table>
+            </div>
         </>
     );
 };

@@ -85,7 +85,8 @@ app.post('/api/posts', (req, res) => {
 
 //View list of posts
 app.get('/api/posts', (req, res) => {
-    pool.query('SELECT * FROM `Posts`', function(err, result, fields) {
+    const sql_query = "SELECT post_id, username, title, created_at, private FROM Posts INNER JOIN Users ON Posts.author_id = Users.user_id";
+    pool.query(sql_query, function(err, result, fields) {
         if (err) throw new Error(err);
         res.send(result);
     });

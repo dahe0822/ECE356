@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { withRouter } from 'react-router';
 import '../stylesheets/login.css';
 
-const LandingPage = ({ onLogin, history }) => {
+const Login = ({ onLogin, history }) => {
     const [username, setUsername] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
 
@@ -17,7 +17,8 @@ const LandingPage = ({ onLogin, history }) => {
                 throw Error(body.message);
             }
             if (body.length > 0) {
-                onLogin(body[0].user_id);
+                const userInfo = body[0]
+                onLogin(userInfo);
                 history.push('/');
             } else {
                 setErrorMsg("Username don't exist. Try again.");
@@ -28,9 +29,9 @@ const LandingPage = ({ onLogin, history }) => {
     };
 
     return (
-        <div class="wrapper">
+        <div className="wrapper">
             <div id="formContent">
-                <div class="fadeIn first">
+                <div className="fadeIn first">
                     <h2>Enter user name</h2>
                 </div>
                 <form onSubmit={handleLogin}>
@@ -39,18 +40,18 @@ const LandingPage = ({ onLogin, history }) => {
                         id="login"
                         name="login"
                         placeholder="username"
-                        class="fadeIn second"
+                        className="fadeIn second"
                         onChange={(e) => {
                             setUsername(e.target.value);
                         }}
                         value={username}
                     />
                     <p>{errorMsg}</p>
-                    <input type="submit" class="fadeIn fourth" value="Log In" />
+                    <input type="submit" className="fadeIn fourth" value="Log In" />
                 </form>
             </div>
         </div>
     );
 };
 
-export default withRouter(LandingPage);
+export default withRouter(Login);
