@@ -7,20 +7,21 @@ const Home = (props) => {
     const [data, setData] = useState({ posts: [] });
 
     useEffect(() => {
-        const getAllPosts = async () => {
-            try {
-                const response = await fetch(`/api/posts`, { method: 'GET' });
-                const body = await response.json();
-                if (response.status !== 200) {
-                    throw Error(body.message);
-                }
-                setData({ ...data, posts: body });
-            } catch (error) {
-                alert(error);
-            }
-        };
         getAllPosts();
-    }, [data]);
+    }, []);
+
+    const getAllPosts = async () => {
+        try {
+            const response = await fetch(`/api/posts`, { method: 'GET' });
+            const body = await response.json();
+            if (response.status !== 200) {
+                throw Error(body.message);
+            }
+            setData({ ...data, posts: body });
+        } catch (error) {
+            alert(error);
+        }
+    };
 
     const listOfPosts = data.posts.map(function(post) {
         const { post_id, username, title, created_at } = post;
@@ -41,6 +42,7 @@ const Home = (props) => {
             <div className="container">
             <CreatePost 
                 user_id={props.user.user_id}
+                refreshPostList={getAllPosts}
             />
             <h2>Post List</h2>
             <table className="table">

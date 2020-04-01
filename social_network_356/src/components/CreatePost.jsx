@@ -15,7 +15,7 @@ const CreatePost = (props) => {
     const CONTENT_EMPTY_MSG = "Enter the content!";
    
     const insertPostAndHashtag = async() => {
-        const url ='/api/posthashtag';
+        const url ='/api/post';
             const data = { author_id: props.user_id, title: title, content_body: body, hashtags: addedHashtags };
     
             try {
@@ -50,6 +50,7 @@ const CreatePost = (props) => {
             setTitle('');
             setBody('');
             setAddedHashtags([]);
+            props.refreshPostList();
         }
     };
 
