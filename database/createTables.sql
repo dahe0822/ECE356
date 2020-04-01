@@ -6,7 +6,7 @@ use socialBlog;
 drop table if exists Users;
 drop table if exists Posts;
 drop table if exists Hashtag;
-drop table if exists PostHashTag;
+drop table if exists PostHashtag;
 drop table if exists UserPostRead;
 drop table if exists ThumbsType;
 drop table if exists PostThumbsResponse;
@@ -45,7 +45,7 @@ create table Hashtag (
 );
 
 -- map hashtags associated with a post
-create table PostHashTag (
+create table PostHashtag (
 	post_id INT,
     hashtag_id INT,
     primary key (post_id, hashtag_id),
