@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import NavigationBar from './NavigationBar'
 import CreatePost from './CreatePost'
 import '../stylesheets/home.css';
 
@@ -36,9 +35,6 @@ const Home = (props) => {
 
     return (
         <>
-            <NavigationBar
-                username={props.user.username}
-            />
             <div className="container">
             <CreatePost 
                 user_id={props.user.user_id}

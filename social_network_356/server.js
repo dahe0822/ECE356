@@ -115,6 +115,100 @@ app.get('/api/hashtag', (req, res) => {
     });
 });
 
+//Search results of user and return following information (not from current user)
+app.get('/api/search/:username', (req, res) => {
+    
+    let currUser = req.params.username;
+    const user = req.query.user;
+    const hashtag = req.query.hashtag;
+    const group = req.query.group;
+
+    let query = "";
+    let searchFor = "";
+    if(user){
+      let raw = "SELECT SearchedUser.id, SearchedUser.name, (followedId IS NOT NULL) isFollowing FROM \
+        (SELECT user_id as id,username as name FROM Users WHERE instr(username, ?) AND user_id<>?) as SearchedUser LEFT JOIN \
+        (SELECT follower_id as followedId from Following where user_id=?) as Followed ON followedId=id;"
+      query= mysql.format(raw, [user, currUser, currUser]);
+    } else if(hashtag){
+      let raw = "SELECT id, name, (followedId IS NOT NULL) isFollowing FROM \
+	      (SELECT hashtag_id as id, name FROM Hashtag WHERE instr(name, ?)) as Searched LEFT JOIN \
+        (SELECT hashtag_id as followedId from HashtagFollowing where user_id=?) as Followed ON followedId=id;"
+      query= mysql.format(raw, [hashtag, currUser]);
+      searchFor = user;
+    } else if(group){
+      let raw = "SELECT id, name, (followedId IS NOT NULL) isFollowing FROM \
+	      (SELECT group_id as id, name FROM Groups WHERE instr(name, ?)) as Searched LEFT JOIN \
+        (SELECT group_id as followedId from GroupMembers where user_id=?) as Followed ON followedId=id;"
+      query= mysql.format(raw, [group, currUser]);
+      searchFor = user;
+    } else{
+      return res.send([]);
+    }
+    console.log(query);
+    pool.query(
+        query,
+        function(err, result, fields) {
+            if (err) throw new Error(err);
+            res.send(result);
+        }
+    );
+});
+
+// Unfollow: (hashtag, group, user)
+app.post('/api/unfollow/:type', (req, res) => {
+    const { user_id, followId } = req.body;
+    let type = req.params.type; // user | group | hashtag
+
+    let raw = "";
+    if(type == "user"){
+      raw = "DELETE FROM Following WHERE user_id=? and follower_id=?;"
+    } else if(type == "hashtag"){
+      raw = "DELETE FROM HashtagFollowing WHERE user_id=? and hashtag_id=?;"
+    } else if(type = "group"){
+      raw = "DELETE FROM GroupMembers WHERE user_id=? and group_id=?;"
+    } else{
+      return res.send(null);
+    }
+    console.log(raw);
+    console.log("UESEERRRRID ", user_id);
+    pool.query(
+      raw,
+      [user_id, followId],
+      function(err, result, fields) {
+          if (err) throw new Error(err);
+          res.send(result);
+      }
+    );
+});
+
+// Follow: (hashtag, group, user)
+app.post('/api/follow/:type', (req, res) => {
+    const { user_id, followId } = req.body;
+    let type = req.params.type; // user | group | hashtag
+    
+    const created_at = new Date();
+    let raw = "";
+    if(type == "user"){
+      raw = "INSERT INTO Following SET user_id=?, follower_id=?, followed_at=?;"
+    } else if(type == "hashtag"){
+      raw = "INSERT INTO HashtagFollowing SET user_id=?, hashtag_id=?, followed_at=?;"
+    } else if(type = "group"){
+      raw = "INSERT INTO GroupMembers SET user_id=?, group_id=?, joined_at=?;"
+    } else{
+      return res.send(null);
+    }
+    console.log(raw);
+    pool.query(
+      raw,
+      [user_id, followId, created_at],
+      function(err, result, fields) {
+          if (err) throw new Error(err);
+          res.send(result);
+      }
+    );
+});
+
 //Insert hashtag if not exist
 app.post('/api/hashtag', (req, res) => {
     const { hashtags } = req.body;
