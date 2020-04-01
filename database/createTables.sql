@@ -2,6 +2,7 @@
 drop database if exists socialBlog;
 create database socialBlog;
 use socialBlog;
+ALTER DATABASE socialBlog DEFAULT COLLATE utf8mb4_general_ci;
 
 drop table if exists Users;
 drop table if exists Posts;
