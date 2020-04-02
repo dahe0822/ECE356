@@ -1,0 +1,41 @@
+.post-details-container {
+    /* text-align: left; */
+}
+
+.comments-container {
+    text-align: left;
+    padding: 1rem;
+    /* display: flex;
+    align-content: center; */
+}
+
+.create-date {
+    margin-left: 10px;
+    color: rgb(109, 109, 109);
+    vertical-align: sub;
+    font-size: 0.7em;
+}
+
+.comments-header {
+    margin-left: 1rem;
+    font-size: 1.2em;
+    text-align: left;
+}
+
+.content-body{
+    padding-bottom: 30px;
+    border-bottom: 1px dotted black;
+    margin: 20px;
+    font-size: 16px;
+    font-size: 5vw;
+}
+
+.input-field.comment{
+    height: 2rem;
+    margin: 6px;
+    width: 50%;
+}
+
+.comment-list-item {
+    padding: 5px;
+}

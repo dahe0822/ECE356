@@ -84,9 +84,21 @@ app.post('/api/posts', (req, res) => {
     );
 });
 
-//View list of posts
-app.get('/api/posts', (req, res) => {
-    const sql_query = "SELECT post_id, username, title, created_at, private FROM Posts INNER JOIN Users ON Posts.author_id = Users.user_id";
+//View list of posts for specific user
+app.get('/api/posts/:user_id', (req, res) => {
+    const user_id = req.params.user_id;
+    // const sql_query = "SELECT post_id, username, title, created_at, private FROM Posts INNER JOIN Users ON Posts.author_id = Users.user_id";
+    const sql_query = `SELECT Posts.post_id, Users.username, Posts.title, Posts.content_body, Posts.created_at, Posts.private, true AS user_read
+    FROM  Posts INNER JOIN
+             Users ON Posts.author_id = Users.user_id LEFT OUTER JOIN
+             UserPostRead ON UserPostRead.user_id = ${user_id} AND Posts.post_id = UserPostRead.post_id
+    WHERE (UserPostRead.post_id IS NOT NULL)
+    UNION
+    SELECT Posts_1.post_id, Users_1.username, Posts_1.title, Posts_1.content_body, Posts_1.created_at, Posts_1.private, false AS user_read
+    FROM  Posts Posts_1 INNER JOIN
+             Users Users_1 ON Posts_1.author_id = Users_1.user_id LEFT OUTER JOIN
+             UserPostRead UserPostRead_1 ON UserPostRead_1.user_id = ${user_id} AND Posts_1.post_id = UserPostRead_1.post_id
+    WHERE (UserPostRead_1.post_id IS NULL)`;
     pool.query(sql_query, function(err, result, fields) {
         if (err) throw new Error(err);
         res.send(result);
@@ -94,11 +106,53 @@ app.get('/api/posts', (req, res) => {
 });
 
 //View one post
-app.get('/api/posts/:postId', (req, res) => {
+app.get('/api/post/:postId', (req, res) => {
     pool.query(
-        'SELECT * FROM `Posts` WHERE post_id = ? ',
+        'SELECT post_id, title, content_body, created_at, author_id, private FROM `Posts` WHERE post_id = ? ',
         [req.params.postId],
         function(err, result, fields) {
+            if (err) throw new Error(err);
+            res.send(result);
+        }
+    );
+});
+
+//View comments on a post
+app.get('/api/comments/:postId', (req, res) => {
+    pool.query(
+        `SELECT comment_id, post_id, comment, created_at, username as author_name FROM Comments INNER JOIN Users ON Users.user_id = Comments.author_id WHERE post_id = ?`,
+        [req.params.postId],
+        function(err, result, fields) {
+            if (err) throw new Error(err);
+            res.send(result);
+        }
+    );
+});
+
+// Insert a comment
+app.post('/api/comment', (req, res) => {
+    const {author_id, comment, post_id } = req.body;    
+    const created_at = new Date();
+    const sql_query = 'INSERT INTO Comments SET ?';
+    // console.log(sql_query);
+    pool.query(
+        sql_query,
+        { author_id, comment, post_id, created_at },
+        function(err, result, fields) {
+            if (err) throw new Error(err);
+            res.send(result);
+        }
+    );
+});
+
+// mark a post as read by user
+app.post('/api/read', (req, res) => {
+    const { user_id, post_id } = req.body;    
+    const sql_query = 'INSERT INTO UserPostRead SET ?';
+    pool.query(
+        sql_query,
+        { user_id, post_id },
+        function(err, result) {
             if (err) throw new Error(err);
             res.send(result);
         }
@@ -230,7 +284,7 @@ app.post('/api/hashtag', (req, res) => {
 });
 
 // Create a post and new hashtags then pair them in PostHashtag table
-app.post('/api/post', (req, res) => {
+app.post('/api/create_post', (req, res) => {
     const { author_id, title, content_body, hashtags } = req.body;
     
     const created_at = new Date();
@@ -241,10 +295,10 @@ app.post('/api/post', (req, res) => {
         union_sql += `SELECT '${hashtags[i]}' as name ${UNION}`;
     };
     union_sql = union_sql.substring(0, union_sql.length - UNION.length-1);
-    var insert_hashtag_sql = `INSERT INTO Hashtag (name) SELECT name from (${union_sql}) as User_Hashtags where not exists (select name from Hashtag WHERE User_Hashtags.name = Hashtag.name)`
     var insert_post_sql = `INSERT INTO Posts SET ?`;
-    var pair_post_and_hashtag = `INSERT INTO PostHashtag (post_id, hashtag_id) SELECT post_id, hashtag_id from (${union_sql}) as t1 inner join Hashtag using(name) CROSS JOIN (SELECT MAX(post_id) as post_id from Posts) as t2`;
-    var sql = `${insert_post_sql}; ${insert_hashtag_sql}; ${pair_post_and_hashtag};`;
+    var insert_hashtag_sql = hashtags.length === 0 ? '' : `INSERT INTO Hashtag (name) SELECT name from (${union_sql}) as User_Hashtags where not exists (select name from Hashtag WHERE User_Hashtags.name = Hashtag.name);`
+    var pair_post_and_hashtag = hashtags.length === 0 ? '' :`INSERT INTO PostHashtag (post_id, hashtag_id) SELECT post_id, hashtag_id from (${union_sql}) as t1 inner join Hashtag using(name) CROSS JOIN (SELECT MAX(post_id) as post_id from Posts) as t2;`;
+    var sql = `${insert_post_sql}; ${insert_hashtag_sql} ${pair_post_and_hashtag}`;
     console.log(sql);
     pool.query(
         sql,

@@ -6,6 +6,24 @@
     max-width: 20%;
 }
 
+.input-field {
+    background-color: #f6f6f6;
+    border: none;
+    color: #0d0d0d;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border: 2px solid #f6f6f6;
+    -webkit-border-radius: 5px 5px 5px 5px;
+    border-radius: 5px 5px 5px 5px;
+    vertical-align: middle;
+}
+
+.input-field:focus {
+    background-color: #fff;
+    border: 2px solid #000;
+}
+
 .post-content-input-field {
     height: 200px;
     background-color: #f6f6f6;

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import CreatePost from './CreatePost'
+import PostDetails from './PostDetails'
 import '../stylesheets/home.css';
 
 const Home = (props) => {
@@ -11,7 +12,9 @@ const Home = (props) => {
 
     const getAllPosts = async () => {
         try {
-            const response = await fetch(`/api/posts`, { method: 'GET' });
+            const user_id = props.user.user_id;
+            const response = await fetch(
+                `/api/posts/${user_id}`, { method: 'GET' });
             const body = await response.json();
             if (response.status !== 200) {
                 throw Error(body.message);
@@ -23,13 +26,17 @@ const Home = (props) => {
     };
 
     const listOfPosts = data.posts.map(function(post) {
-        const { post_id, username, title, created_at } = post;
+        const { post_id, username, title, content_body, created_at, user_read } = post;
+        const read = user_read ? "read" : "X";
         return (
-            <tr key={ post_id }>
-                <td>{ username } </td>
-                <td className="post-list-title">{ title } </td>
-                <td>{ created_at } </td>                
-            </tr>
+            <>
+            
+               <PostDetails
+                    post={post}
+                    user_id={props.user.user_id}
+               /> 
+            
+            </>
         );
     });
 
@@ -47,6 +54,7 @@ const Home = (props) => {
                     <th>username</th>
                     <th className="post-list-title">title</th>
                     <th>created at</th>
+                    <th>read</th>
                 </tr>
                 </thead>
                 <tbody>

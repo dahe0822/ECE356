@@ -15,7 +15,7 @@ const CreatePost = (props) => {
     const CONTENT_EMPTY_MSG = "Enter the content!";
    
     const insertPostAndHashtag = async() => {
-        const url ='/api/post';
+        const url ='/api/create_post';
             const data = { author_id: props.user_id, title: title, content_body: body, hashtags: addedHashtags };
     
             try {
@@ -30,6 +30,7 @@ const CreatePost = (props) => {
                 if (response.status !== 200) {
                     throw Error(body.message);
                 }
+                props.refreshPostList();
             } catch (error) {
                 alert(error);
             }
@@ -50,7 +51,6 @@ const CreatePost = (props) => {
             setTitle('');
             setBody('');
             setAddedHashtags([]);
-            props.refreshPostList();
         }
     };
 
@@ -89,7 +89,6 @@ const CreatePost = (props) => {
     const removeHashtag = (hashtag) => {
         const newHashtags = addedHashtags.filter(item => item !== hashtag);
         setAddedHashtags(newHashtags);
-        console.log(hashtag);
     };
 
     return (
