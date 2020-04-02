@@ -4,12 +4,14 @@ import '../stylesheets/postDetails.css';
 
 const PostDetails = (props) => {
     const [comments, setComments] = useState([]);
+    const [hashtags, setHashtags] = useState([]);
     const [open, setOpen] = useState(false);
     const [comment, setComment] = useState('');
     const [userRead, setUserRead] = useState(props.post.user_read);
 
     useEffect(() => {
         getComments();
+        getHashtags();
     }, []);
 
     const getComments = async () => {
@@ -22,6 +24,21 @@ const PostDetails = (props) => {
                 throw Error(body.message);
             }
             setComments(body);
+        } catch (error) {
+            alert(error);
+        }
+    };
+
+    const getHashtags = async () => {
+        try {
+            const post_id = props.post.post_id;
+            const response = await fetch(
+                `/api/hashtags/${post_id}`, { method: 'GET' });
+            const body = await response.json();
+            if (response.status !== 200) {
+                throw Error(body.message);
+            }
+            setHashtags(body);
         } catch (error) {
             alert(error);
         }
@@ -80,6 +97,13 @@ const PostDetails = (props) => {
         );
     });
 
+    const listOfHashtags = hashtags.map(function(hashtag) {
+        return (
+            <>
+               <div className="hashtag" key={hashtag.name}>{"#"}{hashtag.name}</div>
+            </>
+        );
+    });
     
     const addComment = event => {
         event.preventDefault();
@@ -114,6 +138,7 @@ const PostDetails = (props) => {
         <td colspan="4" className="">
             <div className="post-details-container">
                 <div className="content-body">{content_body}</div>
+                <div className="hashtags">{listOfHashtags}</div>
                 
                 <div className="comments-header">Comments</div>
                 <div className="comments-container">

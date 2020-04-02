@@ -169,6 +169,19 @@ app.get('/api/hashtag', (req, res) => {
     });
 });
 
+//View hashtags on a post
+app.get('/api/hashtags/:postId', (req, res) => {
+    pool.query(
+        `SELECT name FROM PostHashtag INNER JOIN Hashtag using (hashtag_id) WHERE post_id = ?`,
+        [req.params.postId],
+        function(err, result, fields) {
+            if (err) throw new Error(err);
+            res.send(result);
+        }
+    );
+});
+
+
 //Search results of user and return following information (not from current user)
 app.get('/api/search/:username', (req, res) => {
     

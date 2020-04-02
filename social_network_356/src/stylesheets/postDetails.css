@@ -39,3 +39,9 @@
 .comment-list-item {
     padding: 5px;
 }
+
+.hashtag{
+    display: inline-block;
+    margin-right: 10px;
+    color: #17a2b8;
+}
