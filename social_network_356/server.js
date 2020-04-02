@@ -88,17 +88,19 @@ app.post('/api/posts', (req, res) => {
 app.get('/api/posts/:user_id', (req, res) => {
     const user_id = req.params.user_id;
     // const sql_query = "SELECT post_id, username, title, created_at, private FROM Posts INNER JOIN Users ON Posts.author_id = Users.user_id";
-    const sql_query = `SELECT * FROM (SELECT Posts.post_id, Users.username, Posts.title, Posts.content_body, Posts.created_at, Posts.private, true AS user_read
-    FROM  Posts INNER JOIN
-             Users ON Posts.author_id = Users.user_id LEFT OUTER JOIN
-             UserPostRead ON UserPostRead.user_id = ${user_id} AND Posts.post_id = UserPostRead.post_id
-    WHERE (UserPostRead.post_id IS NOT NULL)
-    UNION
-    SELECT Posts_1.post_id, Users_1.username, Posts_1.title, Posts_1.content_body, Posts_1.created_at, Posts_1.private, false AS user_read
-    FROM  Posts Posts_1 INNER JOIN
-             Users Users_1 ON Posts_1.author_id = Users_1.user_id LEFT OUTER JOIN
-             UserPostRead UserPostRead_1 ON UserPostRead_1.user_id = ${user_id} AND Posts_1.post_id = UserPostRead_1.post_id
-    WHERE (UserPostRead_1.post_id IS NULL)) ORDER BY created_at DESC`;
+    const sql_query = `SELECT post_id, username, title, content_body, created_at, private, user_read
+    FROM  (SELECT Posts.post_id, Users.username, Posts.title, Posts.content_body, Posts.created_at, Posts.private, true AS user_read
+             FROM  Posts INNER JOIN
+                      Users ON Posts.author_id = Users.user_id LEFT OUTER JOIN
+                      UserPostRead ON UserPostRead.user_id = ${user_id} AND Posts.post_id = UserPostRead.post_id
+             WHERE (UserPostRead.post_id IS NOT NULL)
+             UNION
+             SELECT Posts_1.post_id, Users_1.username, Posts_1.title, Posts_1.content_body, Posts_1.created_at, Posts_1.private, false AS user_read
+             FROM  Posts Posts_1 INNER JOIN
+                      Users Users_1 ON Posts_1.author_id = Users_1.user_id LEFT OUTER JOIN
+                      UserPostRead UserPostRead_1 ON UserPostRead_1.user_id = ${user_id} AND Posts_1.post_id = UserPostRead_1.post_id
+             WHERE (UserPostRead_1.post_id IS NULL)) derivedtbl_1
+    ORDER BY created_at DESC`;
     pool.query(sql_query, function(err, result, fields) {
         if (err) throw new Error(err);
         res.send(result);
