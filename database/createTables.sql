@@ -22,7 +22,7 @@ drop table if exists GroupPosts;
 create table Users (
 	user_id INT auto_increment, 
 	username varchar(10) Not null Unique, 
-    birthday DATE,
+    birthday DATETIME,
     primary key (user_id)
 );
 
@@ -33,7 +33,7 @@ create table Posts (
     private bool Default false,
     title varchar(50) Not null,
     content_body varchar(5000) ,
-    created_at date,
+    created_at DATETIME,
     primary key (post_id),
     foreign key (author_id) references Users(user_id)
 );
@@ -75,7 +75,7 @@ create table PostThumbsResponse (
 	user_id INT,
 	post_id INT, 
     thumbs_id INT,
-    created_at DATE,
+    created_at DATETIME,
     primary key (user_id, post_id),
     foreign key (user_id) references Users(user_id),
 	foreign key (post_id) references Posts(post_id),
@@ -87,7 +87,7 @@ create table Comments (
     comment_id INT auto_increment,
     post_id INT, 
     `comment` varchar(1000),
-    created_at DATE,
+    created_at DATETIME,
     author_id INT,
     primary key (comment_id),
     foreign key (post_id) references Posts(post_id),
@@ -98,7 +98,7 @@ create table Comments (
 create table `Following` (
     user_id INT,
     follower_id INT,
-    followed_at DATE,
+    followed_at DATETIME,
     primary key (user_id, follower_id),
     foreign key (user_id) references Users(user_id),
     foreign key (follower_id) references Users(user_id)
@@ -108,7 +108,7 @@ create table `Following` (
 create table HashtagFollowing (
     user_id INT,
     hashtag_id INT,
-    followed_at DATE,
+    followed_at DATETIME,
     primary key (user_id, hashtag_id),
     foreign key (user_id) references Users(user_id),
     foreign key (hashtag_id) references Hashtag(hashtag_id)
@@ -120,7 +120,7 @@ create table `Groups` (
     admin_id INT,
     `name` varchar(50),
     memberSizeLimit INT,
-    created_at DATE,
+    created_at DATETIME,
     primary key (group_id),
     foreign key (admin_id) references Users(user_id)
 );
@@ -129,7 +129,7 @@ create table `Groups` (
 create table GroupMembers (
     group_id INT,
     user_id INT,
-    joined_at DATE,
+    joined_at DATETIME,
     primary key (group_id, user_id),
     foreign key (group_id) references `Groups`(group_id),
     foreign key (user_id) references Users(user_id)
