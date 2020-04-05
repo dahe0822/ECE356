@@ -3,7 +3,8 @@ import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import Login from './components/Login';
 import SearchPage from './components/SearchPage';
 import Home from './components/Home';
-import NavigationBar from './components/NavigationBar'
+import NavigationBar from './components/NavigationBar';
+import GroupPage from './components/Group';
 
 function App() {
     //if userId null, then it's not yet authenticated
@@ -16,7 +17,7 @@ function App() {
                 user != null ? (
                   <>
                     <NavigationBar
-                      username={user.username}
+                      user={user}
                     />
                     <Component 
                     {...props}
@@ -41,6 +42,7 @@ function App() {
                     />
                 </Route>
                 <PrivateRoute path="/search" component={SearchPage} />
+                <PrivateRoute path="/group/:id" component={GroupPage} />
                 <PrivateRoute path="/" component={Home} />
             </Switch>
         </BrowserRouter>

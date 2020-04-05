@@ -70,37 +70,52 @@ app.get('/api/users/:username', (req, res) => {
     );
 });
 
-//Create public posts
-app.post('/api/posts', (req, res) => {
-    const { author_id, title, content_body } = req.body;
-    const created_at = new Date();
-    pool.query(
-        'INSERT INTO `Posts` SET ?',
-        { author_id, title, content_body, created_at },
-        function(err, result, fields) {
-            if (err) throw new Error(err);
-            res.send(result);
-        }
-    );
-});
-
 //View list of posts for specific user
 app.get('/api/posts/:user_id', (req, res) => {
     const user_id = req.params.user_id;
     // const sql_query = "SELECT post_id, username, title, created_at, private FROM Posts INNER JOIN Users ON Posts.author_id = Users.user_id";
+    const allPostsThatUserFollow = `(Select * from Posts inner join PostHashtag using(post_id) where private = false AND
+	          (author_id in (SELECT follower_id from Following where user_id=${user_id} Union Select ${user_id})  or
+            hashtag_id in (SELECT hashtag_id from HashtagFollowing where user_id=${user_id})))`
+
     const sql_query = `SELECT Posts.post_id, Users.username, Posts.title, Posts.content_body, Posts.created_at, Posts.private, true AS user_read
-    FROM  Posts INNER JOIN
+    FROM ${allPostsThatUserFollow} as Posts INNER JOIN
              Users ON Posts.author_id = Users.user_id LEFT OUTER JOIN
              UserPostRead ON UserPostRead.user_id = ${user_id} AND Posts.post_id = UserPostRead.post_id
     WHERE (UserPostRead.post_id IS NOT NULL)
     UNION
     SELECT Posts_1.post_id, Users_1.username, Posts_1.title, Posts_1.content_body, Posts_1.created_at, Posts_1.private, false AS user_read
-    FROM  Posts Posts_1 INNER JOIN
+    FROM (Select * from Posts where private = false) as Posts_1 INNER JOIN
              Users Users_1 ON Posts_1.author_id = Users_1.user_id LEFT OUTER JOIN
              UserPostRead UserPostRead_1 ON UserPostRead_1.user_id = ${user_id} AND Posts_1.post_id = UserPostRead_1.post_id
     WHERE (UserPostRead_1.post_id IS NULL)`;
     pool.query(sql_query, function(err, result, fields) {
         if (err) throw new Error(err);
+        res.send(result);
+    });
+});
+
+
+//View list of posts in a group
+app.get('/api/groupPosts/:group_id/:user_id', (req, res) => {
+    const group_id = req.params.group_id;
+    const user_id = req.params.user_id; 
+    // const sql_query = "SELECT post_id, username, title, created_at, private FROM Posts INNER JOIN Users ON Posts.author_id = Users.user_id";
+    const sql_query = `SELECT Posts.post_id, Users.username, Posts.title, Posts.content_body, Posts.created_at, Posts.private, true AS user_read
+    FROM (Select * from Posts where private = true) as Posts
+             INNER JOIN GroupPosts ON group_id=${group_id} AND Posts.post_id = GroupPosts.post_id
+             INNER JOIN Users ON Posts.author_id = Users.user_id LEFT OUTER JOIN
+             UserPostRead ON UserPostRead.user_id = ${user_id} AND Posts.post_id = UserPostRead.post_id
+    WHERE (UserPostRead.post_id IS NOT NULL)
+    UNION
+    SELECT Posts_1.post_id, Users_1.username, Posts_1.title, Posts_1.content_body, Posts_1.created_at, Posts_1.private, false AS user_read
+    FROM (Select * from Posts where private = true) as Posts_1 
+             INNER JOIN GroupPosts ON group_id=${group_id} AND Posts_1.post_id = GroupPosts.post_id
+             INNER JOIN Users Users_1 ON Posts_1.author_id = Users_1.user_id LEFT OUTER JOIN
+             UserPostRead UserPostRead_1 ON UserPostRead_1.user_id = ${user_id} AND Posts_1.post_id = UserPostRead_1.post_id
+    WHERE (UserPostRead_1.post_id IS NULL)`;
+    pool.query(sql_query, function(err, result, fields) {
+        //if (err) throw new Error(err);
         res.send(result);
     });
 });
@@ -231,7 +246,7 @@ app.post('/api/unfollow/:type', (req, res) => {
       raw = "DELETE FROM Following WHERE user_id=? and follower_id=?;"
     } else if(type == "hashtag"){
       raw = "DELETE FROM HashtagFollowing WHERE user_id=? and hashtag_id=?;"
-    } else if(type = "group"){
+    } else if(type == "group"){
       raw = "DELETE FROM GroupMembers WHERE user_id=? and group_id=?;"
     } else{
       return res.send(null);
@@ -257,7 +272,7 @@ app.post('/api/follow/:type', (req, res) => {
       raw = "INSERT INTO Following SET user_id=?, follower_id=?, followed_at=?;"
     } else if(type == "hashtag"){
       raw = "INSERT INTO HashtagFollowing SET user_id=?, hashtag_id=?, followed_at=?;"
-    } else if(type = "group"){
+    } else if(type == "group"){
       raw = "INSERT INTO GroupMembers SET user_id=?, group_id=?, joined_at=?;"
     } else{
       return res.send(null);
@@ -291,9 +306,37 @@ app.post('/api/hashtag', (req, res) => {
     );
 });
 
+//Create public post
+app.post('/api/createPublicPost', (req, res) => {
+    create_post({...req.body, private:false}, function(err, result){
+      if(err) throw new Error(err);
+      res.send(result);
+    })
+});
+
+//Create private group post
+app.post('/api/createGroupPost/:id', (req, res) => {
+    const group_id = req.params.id; // user | group | hashtag
+
+    create_post({...req.body, private:true}, function(err, result){
+      if(err) throw new Error(err);
+      if(result && result.newPostId){
+        let newPostId = result.newPostId;
+        pool.query(
+            "INSERT INTO GroupPosts SET ?",
+            {group_id, post_id: newPostId},
+            function(err, result) {
+                if (err) throw new Error(err);
+                res.send(result);
+            }
+        );
+      }
+    })
+});
+
 // Create a post and new hashtags then pair them in PostHashtag table
-app.post('/api/create_post', (req, res) => {
-    const { author_id, title, content_body, hashtags } = req.body;
+function create_post(req, callback) {
+    const { author_id, title, content_body, hashtags, private } = req;
     
     const created_at = new Date();
     
@@ -306,14 +349,148 @@ app.post('/api/create_post', (req, res) => {
     var insert_post_sql = `INSERT INTO Posts SET ?`;
     var insert_hashtag_sql = hashtags.length === 0 ? '' : `INSERT INTO Hashtag (name) SELECT name from (${union_sql}) as User_Hashtags where not exists (select name from Hashtag WHERE User_Hashtags.name = Hashtag.name);`
     var pair_post_and_hashtag = hashtags.length === 0 ? '' :`INSERT INTO PostHashtag (post_id, hashtag_id) SELECT post_id, hashtag_id from (${union_sql}) as t1 inner join Hashtag using(name) CROSS JOIN (SELECT MAX(post_id) as post_id from Posts) as t2;`;
-    var sql = `${insert_post_sql}; ${insert_hashtag_sql} ${pair_post_and_hashtag}`;
+    var sql = `${insert_hashtag_sql} ${pair_post_and_hashtag}`;
+    //insert the post first, then insert the hashtag (because we need the inserted post id)
     pool.query(
-        sql,
-        { author_id, title, content_body, created_at },
+        insert_post_sql,
+        { author_id, title, content_body, created_at, private },
+        function(err, result, fields) {
+            if (err) throw new Error(err);
+            const returnVal = {newPostId: result.insertId};
+            
+            //Send the hashtag if exist
+            if(sql.trim().length>0){
+              pool.query(
+                  sql,
+                  function(err, result, fields) {
+                      if (err) throw new Error(err);
+                      callback(null, returnVal);
+                  }
+              );
+            }else{
+              callback(null, returnVal);
+            }
+        }
+    );
+}
+
+// Create a group
+app.post('/api/group', (req, res) => {
+    const { admin_id, name, memberSizeLimit } = req.body;
+    const created_at = new Date();
+
+    pool.query(
+        "INSERT INTO Groups SET ?",
+        { admin_id, name, memberSizeLimit, created_at },
+        function(err, result, fields) {
+            if (err) throw new Error(err);
+            let inserted_id = result.insertId;
+            //insert to members
+            pool.query(
+                "INSERT INTO GroupMembers SET group_id=?, user_id=?, joined_at=?",
+                [ inserted_id, admin_id, created_at ],
+                function(err, result, fields) {
+                    if (err) throw new Error(err);
+                    res.send({success: true, insertedId: inserted_id});
+                }
+            );
+        }
+    );
+});
+
+// Add member to group
+app.post('/api/groupMember', (req, res) => {
+    const { group_id, user_id } = req.body;
+    const joined_at = new Date();
+
+    pool.query(
+        "INSERT INTO GroupMembers SET ?",
+        { group_id, user_id, joined_at },
         function(err, result, fields) {
             if (err) throw new Error(err);
             res.send(result);
         }
     );
 });
+
+// Delete member from group
+app.delete('/api/groupMember', (req, res) => {
+    const { group_id, user_id } = req.body;
+
+    pool.query(
+        "DELETE FROM GroupMembers WHERE user_id=? AND group_id=?;",
+        [user_id, group_id],
+        function(err, result, fields) {
+            if (err) throw new Error(err);
+            res.send(result);
+        }
+    );
+});
+
+//Group Add member options: Get followed users that's not currently in the group
+app.get('/api/memberOptions/:group_id/:user_id', (req, res) => {
+    const group_id = req.params.group_id;
+    const user_id = req.params.user_id; 
+
+    pool.query(
+      "SELECT user_id as id, username as name FROM Users where \
+      user_id in (SELECT follower_id from Following where user_id=?) and \
+      user_id not in (SELECT user_id from GroupMembers where group_id=?)",
+      [user_id, group_id],
+      function(err, result, fields) {
+          if (err) throw new Error(err);
+          res.send(result);
+      }
+    );
+});
+
+//Get things followed by the user
+app.post('/api/followed/', (req, res) => {
+    const { user_id, type } = req.body; // type = user | group | hashtag
+    
+    let raw = "";
+    if(type == "user"){
+      raw = "SELECT user_id as id, username as name FROM Users where user_id in (SELECT follower_id from Following where user_id=?)"
+    } else if(type == "hashtag"){
+      raw = "SELECT hashtag_id as id, name FROM Hashtag where hashtag_id in (SELECT hashtag_id from HashtagFollowing where user_id=?)"
+    } else if(type == "group"){
+      raw = "SELECT group_id as id, name FROM Groups where group_id in (SELECT group_id from GroupMembers where user_id=?)"
+    } else{
+      return res.send(null);
+    }
+    pool.query(
+      raw,
+      [user_id],
+      function(err, result, fields) {
+          if (err) throw new Error(err);
+          res.send(result);
+      }
+    );
+});
+
+//Get group information
+app.get('/api/groupInfo/:id', (req, res) => {
+    let groupId = req.params.id; // user | group | hashtag
+
+    pool.query(
+      "SELECT * from Groups where group_id=?",
+      [groupId],
+      function(err, result, fields) {
+          if (err) throw new Error(err);
+          let groupInfo = result;
+
+          pool.query(
+            "SELECT * from Users where user_id in (SELECT user_id from GroupMembers where group_id=?)",
+            [groupId],
+            function(err, result, fields) {
+                if (err) throw new Error(err);
+                res.send({...groupInfo[0], members:result});
+            }
+          );
+      }
+    );
+});
+
+
+
 

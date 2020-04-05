@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { withRouter } from 'react-router';
-import { Navbar, Button, Form, FormControl } from 'react-bootstrap';
+import { Nav, Navbar, Button, Form, FormControl } from 'react-bootstrap';
 import {
   Link
 } from "react-router-dom"
@@ -23,9 +23,9 @@ const NavigationBar = props => {
   return (
     <>
       <Navbar bg="dark" variant="dark">
-      <Navbar.Brand href="">Social Network 356</Navbar.Brand>
+      <Navbar.Brand href="/">Social Network 356</Navbar.Brand>
       <Navbar.Toggle />
-      <Navbar.Collapse className="justify-content-center">
+      <Navbar.Collapse className="centerGroup justify-content-center">
         <Form inline onSubmit={handleSearch}>
           <Form.Control as="select" value={searchMode} onChange={(e)=>{setSearchMode(e.target.value)}}>
             <option value="0">People</option>
@@ -36,10 +36,13 @@ const NavigationBar = props => {
           <Button variant="outline-info" type="submit">Search</Button>
         </Form>
       </Navbar.Collapse>
-      <Navbar.Collapse className="justify-content-end">
-          <Navbar.Text>
-          Signed in as: {props.username}
-          </Navbar.Text>
+      <Navbar.Collapse className="rightGroup justify-content-end">
+        <Navbar.Text>
+          Signed in as: {props.user.username}
+        </Navbar.Text>
+        <Nav>
+          <Nav.Link href="/login">Logout</Nav.Link>
+        </Nav>
       </Navbar.Collapse>
       </Navbar>
     </>
