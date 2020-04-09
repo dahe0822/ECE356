@@ -1,0 +1,1 @@
+insert into ReactionType(thumbs_id, type) values(1, "thumbs-up"), (2, "thumbs-down")

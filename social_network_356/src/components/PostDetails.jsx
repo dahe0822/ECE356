@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Collapse, Button } from 'react-bootstrap';
 import '../stylesheets/postDetails.css';
+import ThumbsUp from '../img/thumbs-up.png';
+import ThumbsDown from '../img/thumbs-down.png';
 
 const PostDetails = (props) => {
     const [comments, setComments] = useState([]);
@@ -8,10 +10,16 @@ const PostDetails = (props) => {
     const [open, setOpen] = useState(false);
     const [comment, setComment] = useState('');
     const [userRead, setUserRead] = useState(props.post.user_read);
+    const [numOfThumbsUp, setNumOfThumbsUp] = useState(0);
+    const [numOfThumbsDown, setNumOfThumbsDown] = useState(0);
+
+    const THUMBSUP_TYPE = "thumbs-up";
+    const THUMBSDOWN_TYPE = "thumbs-down";
 
     useEffect(() => {
         getComments();
         getHashtags();
+        getReaction();
     }, []);
 
     const getComments = async () => {
@@ -44,6 +52,22 @@ const PostDetails = (props) => {
         }
     };
 
+    const getReaction = async () => {
+        try {
+            const post_id = props.post.post_id;
+            const response = await fetch(
+                `/api/post/reaction/${post_id}`, { method: 'GET' });
+            const body = await response.json();
+            if (response.status !== 200) {
+                throw Error(body.message);
+            }
+            setNumOfThumbsUp(body[0].thumbsupcount);
+            setNumOfThumbsDown(body[0].thumbsdowncount);
+        } catch (error) {
+            alert(error);
+        }
+    };
+
     const updateReadStatus = async () => {
         const url ='/api/read';
             const data = { user_id: props.user_id, post_id: props.post.post_id };
@@ -61,6 +85,28 @@ const PostDetails = (props) => {
                     throw Error(body.message);
                 }
                 setUserRead(1);
+            } catch (error) {
+                alert(error);
+            }
+    };
+
+    const updateReaction = async (reactionType) => {
+        const url ='/api/post/reaction';
+            const data = { user_id: props.user_id, post_id: props.post.post_id, reaction_type: reactionType };
+    
+            try {
+                const response = await fetch(
+                    url, 
+                    {   
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify(data)
+                    });
+                const body = await response.json();
+                if (response.status !== 200) {
+                    throw Error(body.message);
+                }
+                getReaction();
             } catch (error) {
                 alert(error);
             }
@@ -118,7 +164,12 @@ const PostDetails = (props) => {
         if (!userRead) {
             updateReadStatus();
         }
-    }
+    };
+
+    const onReactionClick = (reactionType) => {
+        updateReaction(reactionType);
+        getReaction();
+    };
 
     const { post_id, username, title, content_body, created_at } = props.post;
     // const read = readStatus ? "read" : "X";
@@ -139,7 +190,15 @@ const PostDetails = (props) => {
             <div className="post-details-container">
                 <div className="content-body">{content_body}</div>
                 <div className="hashtags">{listOfHashtags}</div>
-                
+                <div className="wrapper">
+                    <div className="thumbs-container">
+                        <img src={ThumbsUp} alt='thumbs-up' onClick={()=>onReactionClick(THUMBSUP_TYPE)} />
+                        <span>{numOfThumbsUp}</span>
+                        <span> | </span>
+                        <span>{numOfThumbsDown}</span>
+                        <img src={ThumbsDown} alt='thumbs-down' onClick={()=>onReactionClick(THUMBSDOWN_TYPE)} />
+                    </div>
+                </div>
                 <div className="comments-header">Comments</div>
                 <div className="comments-container">
                     <div>{listOfComments}</div>

@@ -196,6 +196,33 @@ app.get('/api/hashtags/:postId', (req, res) => {
     );
 });
 
+app.get('/api/post/reaction/:postId', (req, res) => {
+    const postId = req.params.postId;
+    pool.query(
+        `select ${postId} as post_id, thumbsupcount, thumbsdowncount from (select ${postId} as post_id, count(post_id) as 'thumbsupcount' from PostReaction INNER JOIN ReactionType using (reaction_id) where reaction_type ="thumbs-up" and post_id = ${postId}) as t1
+        INNER JOIN (select ${postId} as post_id, count(post_id) as 'thumbsdowncount' from PostReaction INNER JOIN ReactionType using (reaction_id) where reaction_type ="thumbs-down" and post_id = ${postId}) as t2 using (post_id)
+        `,
+        [req.params.postId],
+        function(err, result, fields) {
+            if (err) throw new Error(err);
+            res.send(result);
+        }
+    );
+});
+
+// insert or update reaction for user and post
+app.post('/api/post/reaction', (req, res) => {
+    const { user_id, post_id, reaction_type } = req.body;
+    const created_at = new Date();
+    var sql = `INSERT INTO PostReaction(user_id, post_id, reaction_id, created_at) SELECT ${user_id},${post_id},reaction_id,'${created_at}' FROM ReactionType WHERE reaction_type='${reaction_type}' ON DUPLICATE KEY UPDATE reaction_id = (SELECT reaction_id FROM ReactionType WHERE reaction_type='${reaction_type}')`
+    pool.query(
+        sql,
+        function(err, result) {
+            if (err) throw new Error(err);
+            res.send(result);
+        }
+    );
+});
 
 //Search results of user and return following information (not from current user)
 app.get('/api/search/:username', (req, res) => {

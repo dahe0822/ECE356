@@ -9,8 +9,8 @@ drop table if exists Posts;
 drop table if exists Hashtag;
 drop table if exists PostHashtag;
 drop table if exists UserPostRead;
-drop table if exists ThumbsType;
-drop table if exists PostThumbsResponse;
+drop table if exists ReactionType;
+drop table if exists PostReaction;
 drop table if exists Comments;
 drop table if exists `Following`;
 drop table if exists HashtagFollowing;
@@ -63,23 +63,23 @@ create table UserPostRead (
 	foreign key (post_id) references Posts(post_id)
 );
 
--- List of thumbs response types
-create table ThumbsType (
-    thumbs_id INT auto_increment,
-    thumbs_type ENUM ('up','down'),
-    primary key (thumbs_id)
+-- List of reaction types
+create table ReactionType (
+    reaction_id INT auto_increment,
+    reaction_type VARCHAR(30),
+    primary key (reaction_id)
 );
 
 -- map a (user, post) with a thumbs response from that user
-create table PostThumbsResponse (
+create table PostReaction (
 	user_id INT,
 	post_id INT, 
-    thumbs_id INT,
+    reaction_id INT,
     created_at DATETIME,
     primary key (user_id, post_id),
     foreign key (user_id) references Users(user_id),
 	foreign key (post_id) references Posts(post_id),
-    foreign key (thumbs_id) references ThumbsType(thumbs_id)
+    foreign key (reaction_id) references ReactionType(reaction_id)
 );
 
 -- list of comments mapped to a post
@@ -143,6 +143,4 @@ create table GroupPosts (
     foreign key (group_id) references `Groups`(group_id),
     foreign key (post_id) references Posts(post_id)
 );
-
-
 

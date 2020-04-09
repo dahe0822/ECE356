@@ -45,3 +45,17 @@
     margin-right: 10px;
     color: #17a2b8;
 }
+
+.thumbs-container {
+    display: table-cell;
+    flex-direction: row;
+    align-content: center;
+}
+
+.thumbs-container img {
+    width: 40px;
+}
+
+.thumbs-container span {
+    vertical-align: middle;
+}
