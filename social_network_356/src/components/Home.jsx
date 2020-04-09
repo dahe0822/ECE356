@@ -84,6 +84,7 @@ const Home = (props) => {
         const read = user_read ? "read" : "X";
         return (
           <PostDetails
+              key={post_id}
               post={post}
               user_id={props.user.user_id}
           />

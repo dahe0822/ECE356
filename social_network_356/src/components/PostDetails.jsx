@@ -93,7 +93,6 @@ const PostDetails = (props) => {
     const updateReaction = async (reactionType) => {
         const url ='/api/post/reaction';
             const data = { user_id: props.user_id, post_id: props.post.post_id, reaction_type: reactionType };
-    
             try {
                 const response = await fetch(
                     url, 
@@ -137,17 +136,13 @@ const PostDetails = (props) => {
     const listOfComments = comments.map(function(cmt) {
         const { comment_id, comment, created_at, author_name } = cmt;
         return (
-            <>
-               <div className="comment-list-item" key={comment_id}><b>{author_name}{' - '}</b>{comment} <span className="create-date">{created_at}</span></div>
-            </>
+            <div className="comment-list-item" key={comment_id}><b>{author_name}{' - '}</b>{comment} <span className="create-date">{created_at}</span></div>
         );
     });
 
     const listOfHashtags = hashtags.map(function(hashtag) {
         return (
-            <>
-               <div className="hashtag" key={hashtag.name}>{"#"}{hashtag.name}</div>
-            </>
+            <div className="hashtag" key={hashtag.name}>{"#"}{hashtag.name}</div>
         );
     });
     
@@ -186,7 +181,7 @@ const PostDetails = (props) => {
         
         <tr>
         <Collapse in={open}>
-        <td colspan="4" className="">
+        <td colSpan="4" className="">
             <div className="post-details-container">
                 <div className="content-body">{content_body}</div>
                 <div className="hashtags">{listOfHashtags}</div>

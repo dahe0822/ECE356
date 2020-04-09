@@ -201,8 +201,8 @@ app.get('/api/hashtags/:postId', (req, res) => {
 app.get('/api/post/reaction/:postId', (req, res) => {
     const postId = req.params.postId;
     pool.query(
-        `select ${postId} as post_id, thumbsupcount, thumbsdowncount from (select ${postId} as post_id, count(post_id) as 'thumbsupcount' from PostReaction INNER JOIN ReactionType using (reaction_id) where reaction_type ="thumbs-up" and post_id = ${postId}) as t1
-        INNER JOIN (select ${postId} as post_id, count(post_id) as 'thumbsdowncount' from PostReaction INNER JOIN ReactionType using (reaction_id) where reaction_type ="thumbs-down" and post_id = ${postId}) as t2 using (post_id)
+        `select '${postId}' as post_id, thumbsupcount, thumbsdowncount from (select '${postId}' as post_id, count(post_id) as 'thumbsupcount' from PostReaction INNER JOIN ReactionType using (reaction_id) where reaction_type ="thumbs-up" and post_id = '${postId}') as t1
+        INNER JOIN (select '${postId}' as post_id, count(post_id) as 'thumbsdowncount' from PostReaction INNER JOIN ReactionType using (reaction_id) where reaction_type ="thumbs-down" and post_id = '${postId}') as t2 using (post_id)
         `,
         [req.params.postId],
         function(err, result, fields) {
@@ -216,7 +216,8 @@ app.get('/api/post/reaction/:postId', (req, res) => {
 app.post('/api/post/reaction', (req, res) => {
     const { user_id, post_id, reaction_type } = req.body;
     const created_at = new Date();
-    var sql = `INSERT INTO PostReaction(user_id, post_id, reaction_id, created_at) SELECT ${user_id},${post_id},reaction_id,'${created_at}' FROM ReactionType WHERE reaction_type='${reaction_type}' ON DUPLICATE KEY UPDATE reaction_id = (SELECT reaction_id FROM ReactionType WHERE reaction_type='${reaction_type}')`
+    var sql = `INSERT INTO PostReaction(user_id, post_id, reaction_id, created_at) SELECT '${user_id}','${post_id}',reaction_id,'${created_at}' FROM ReactionType WHERE reaction_type='${reaction_type}' ON DUPLICATE KEY UPDATE reaction_id = (SELECT reaction_id FROM ReactionType WHERE reaction_type='${reaction_type}')`
+    console.log(sql);
     pool.query(
         sql,
         function(err, result) {
@@ -239,18 +240,18 @@ app.get('/api/search/:username', (req, res) => {
     if(user){
       let raw = "SELECT SearchedUser.id, SearchedUser.name, (followedId IS NOT NULL) isFollowing FROM \
         (SELECT user_id as id,username as name FROM Users WHERE instr(username, ?) AND user_id<>?) as SearchedUser LEFT JOIN \
-        (SELECT follower_id as followedId from Following where user_id=?) as Followed ON followedId=id;"
+        (SELECT follower_id as followedId from Following where user_id=?) as Followed ON followedId=id limit 100;"
       query= mysql.format(raw, [user, currUser, currUser]);
     } else if(hashtag){
       let raw = "SELECT id, name, (followedId IS NOT NULL) isFollowing FROM \
 	      (SELECT hashtag_id as id, name FROM Hashtag WHERE instr(name, ?)) as Searched LEFT JOIN \
-        (SELECT hashtag_id as followedId from HashtagFollowing where user_id=?) as Followed ON followedId=id;"
+        (SELECT hashtag_id as followedId from HashtagFollowing where user_id=?) as Followed ON followedId=id limit 100;"
       query= mysql.format(raw, [hashtag, currUser]);
       searchFor = user;
     } else if(group){
       let raw = "SELECT id, name, (followedId IS NOT NULL) isFollowing FROM \
 	      (SELECT group_id as id, name FROM Groups WHERE instr(name, ?)) as Searched LEFT JOIN \
-        (SELECT group_id as followedId from GroupMembers where user_id=?) as Followed ON followedId=id;"
+        (SELECT group_id as followedId from GroupMembers where user_id=?) as Followed ON followedId=id limit 100;"
       query= mysql.format(raw, [group, currUser]);
       searchFor = user;
     } else{
