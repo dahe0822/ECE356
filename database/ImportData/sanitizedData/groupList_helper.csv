@@ -1,0 +1,408 @@
+group_id, group_name
+1,Markham Village
+2,Uptown
+3,Yonge and Eglinton
+4,Liberty Village
+5,The Danforth
+6,Leslieville
+7,Ryerson
+8,Ville-Marie
+9,Anthem
+10,Rosemont-La Petite-Patrie
+11,Homestead
+12,Southeast
+13,Unionville
+14,Summer Hill
+15,Westside
+16,Lawrenceville
+17,Cannonmills
+18,Sherman
+19,The Strip
+20,Riverside
+21,Scarborough
+22,Downtown
+23,Milliken
+24,Eastside
+25,University City
+26,Rathaus
+27,Saint-Laurent
+28,Capitol
+29,Oberer Schlossgarten
+30,Sunrise
+31,St. Lawrence
+32,Eastland
+33,Notre-Dame-de-Grâce
+34,Villeray-Saint-Michel-Parc-Extension
+35,Downsview
+36,Mount Pleasant and Davisville
+37,Squirrel Hill
+38,Downtown Core
+39,Queen Street West
+40,Edgeley
+41,Bloomfield
+42,Goodrich Kirtland
+43,Banksville
+44,Christie Pits
+45,New Town
+46,Spring Valley
+47,Upper Beach
+48,Ohio City
+49,Kensington Market
+50,Campus District
+51,The Annex
+52,Laval
+53,Brockton Village
+54,Etna
+55,Seaton Village
+56,Gateway District
+57,East Credit
+58,Beaconsfield Village
+59,Plateau-Mont-Royal
+60,Fairfax
+61,Verdun
+62,South Side
+63,Ahuntsic-Cartierville
+64,East Liberty
+65,Entertainment District
+66,Puritas-Longmead
+67,Sud-Ouest
+68,Newington
+69,Côte-des-Neiges
+70,Centennial
+71,Northeast District
+72,Summerlin
+73,LaSalle
+74,West End
+75,Church-Wellesley Village
+76,Highland Park
+77,Norman Acres
+78,Elvehjem
+79,Beechview
+80,Ballantyne
+81,Northwest
+82,Southwest
+83,The Junction
+84,Maple
+85,Corktown
+86,Hanlan
+87,Elizabeth
+88,Dixie
+89,Pine Grove
+90,Buttonville
+91,Bickford Park
+92,Willowdale
+93,Koreatown
+94,Little Italy
+95,Old Town
+96,Trinity Bellwoods
+97,Etobicoke
+98,South Park
+99,Dufferin Grove
+100,Niagara
+101,First Ward
+102,Point Breeze
+103,East York
+104,Oakland
+105,South End
+106,Starmount
+107,Schenk - Atwood
+108,Williamson - Marquette
+109,Jefferson
+110,University
+111,Cabbagetown
+112,Tremont
+113,North Broadway
+114,Yorkville
+115,Shadyside
+116,Hazelwood
+117,Mississauga Valley
+118,Mt. Washington
+119,Bayview Village
+120,Dilworth
+121,East Bank
+122,Markland Wood
+123,Swansea
+124,Steele Creek
+125,Greenbush
+126,Old Brooklyn
+127,South Summerlin
+128,Walnut Grove
+129,Palmerston
+130,Mont-Royal
+131,Greektown
+132,Myers Park
+133,Roncesvalles
+134,Port Credit
+135,The Hill District
+136,Parkdale
+137,Erin Mills
+138,Chinatown
+139,Ossington Strip
+140,Avalon
+141,Carrick
+142,Troy Hill
+143,The Beach
+144,Aspinwall
+145,Edgewater
+146,Leith
+147,Brossard
+148,Riverdale
+149,Outremont
+150,South Campus
+151,Mercier-Hochelaga-Maisonneuve
+152,Neue Vorstadt
+153,Plaza Midwood
+154,Stockbridge
+155,Langstaff
+156,Clarkson
+157,Dollard-des-Ormeaux
+158,Brown's Corners
+159,Wychwood
+160,University of Toronto
+161,Eken Park
+162,NoDa
+163,Birchwood
+164,Summit Woods
+165,Biddleville
+166,West Queen West
+167,Cooksville
+168,Meadowvale Village
+169,New Toronto
+170,Relenberg
+171,Windemere
+172,North Side
+173,Distillery District
+174,Knoxville
+175,Civic Center
+176,Greentree
+177,Detroit-Shoreway
+178,Casa Loma
+179,Alexandra Park
+180,Derita
+181,Morningside
+182,Clark-Fulton
+183,Grassmarket
+184,Royal Mile
+185,Bloordale Village
+186,Vilas
+187,Old Malton Village
+188,Discovery District
+189,High Park
+190,High Crossing
+191,Strip District
+192,Universität
+193,Hawthorne
+194,Marchmont
+195,Greensborough
+196,Rosedale
+197,West View
+198,Rockwood Village
+199,Cotswold
+200,South Hill
+201,Harbourfront
+202,Woodbridge
+203,Financial District
+204,Cascade Crossing
+205,Warehouse District
+206,Unionville Mainstreet
+207,Sherwood Forest
+208,Sedgefield
+209,Regent
+210,Westmount
+211,Brooklyn-Centre
+212,Leopold
+213,Midvale Heights Community
+214,Bellevue
+215,Junction Ridge
+216,Brookline
+217,Bloor-West Village
+218,East 185th
+219,Sewickley
+220,Heistand
+221,Haymarket
+222,Oakbridge Community
+223,Hill Farms - University Neighborhood
+224,Bruntsfield
+225,Cornell
+226,Heusteigviertel
+227,Westchester Gardens
+228,Dormont
+229,Polish Hill
+230,Sharpsburg
+231,Yonge and St. Clair
+232,Third Ward
+233,North Charlotte
+234,Central
+235,Hauptbahnhof
+236,Kirkland
+237,Dovercourt
+238,Paw Creek
+239,Emerson East
+240,Spring Harbor
+241,Meadowood
+242,Highland Creek
+243,Saint-Léonard
+244,The Lakes
+245,Fourth Ward
+246,Tower City
+247,Lisgar
+248,Galleria/Uptown
+249,West Bank
+250,Arboretum
+251,Dudgeon-Monroe
+252,City Place
+253,Playhouse Square
+254,Burnhamthorpe
+255,Quadrangle
+256,Wallace Emerson
+257,Brooklyn Acres
+258,Malton
+259,Mineola
+260,Bluff Acres
+261,Regent Square
+262,Deer Park
+263,Burr Oaks
+264,Mayfair Park
+265,East Cleveland
+266,Hough
+267,Stone Meadows
+268,Lachine
+269,Pierrefonds-Roxboro
+270,Quail Hollow
+271,Carpenter-Ridgeway
+272,Westmorland
+273,Streetsville
+274,Garfield
+275,Diemershalde
+276,Rexdale
+277,Hays
+278,Larimer
+279,Starkweather - Yahar
+280,Europaviertel
+281,Fairywood
+282,Brighton Heights
+283,Cudell
+284,Lake Edge
+285,Industrial Valley
+286,Corso Italia
+287,Wisconsin Co-Op Housing
+288,Montréal-Nord
+289,The Meadows
+290,Friendship
+291,Euclid-Green
+292,Cedar Valley
+293,Little Portugal
+294,Carnegie
+295,Anjou
+296,Dorval
+297,Forrest Hill
+298,West Don Lands
+299,Sunset Village
+300,Homewood
+301,Bram's Addition
+302,Bay Creek
+303,Tenney - Lapham
+304,Nobel Park
+305,McClellan Park
+306,Greenfield
+307,Burke Heights
+308,South Broadway
+309,South Collinwood
+310,South Side Slopes
+311,North Collinwood
+312,Broadway-Lakepoint
+313,West Boulevard
+314,Rolling Meadows
+315,Sauk Creek
+316,Wexford
+317,Thornhill Woods
+318,Berkley Oaks
+319,Montréal-Ouest
+320,Capitol View Heights
+321,Dobel
+322,Beaconsfield
+323,Tollcross
+324,Eastmorland
+325,Ahunstic-Cartierville
+326,Lawrence Park
+327,Observatory Hill
+328,Kleinburg
+329,Overbrook
+330,Glendale
+331,St Clair-Superior
+332,Summerville
+333,Côte Saint-Luc
+334,Faircrest
+335,Sainte-Anne-de-Bellevue
+336,Ben Avon
+337,Box Grove
+338,Northeast Shores
+339,Lakeview
+340,Hampstead
+341,Duquesne Heights
+342,Westhaven Trails
+343,Thornhill
+344,Rivière-des-Prairies–Pointe-aux-Trembles
+345,Worthington Park
+346,Moorland - Rimrock
+347,Old Middleton Greenway
+348,Allentown
+349,Tamarack Trails Community
+350,Mt. Oliver
+351,Ile-Perrot
+352,Lorne Park
+353,Ridge & Memphis
+354,Sheraden
+355,The Flats
+356,Waunona
+357,Kinsman
+358,Villa Heights
+359,Vaudreuil-Dorion
+360,Ile-Bizard-Sainte-Genevieve
+361,Willy St
+362,Emsworth
+363,Maple - Prairie
+364,Glenville
+365,Pointe-Claire
+366,Allied Dunn's Marsh
+367,Bon Air
+368,200th Street
+369,Orchard Ridge Community
+370,Erindale
+371,Highland
+372,Millvale
+373,Concord
+374,Hawk's Landing
+375,Baie-d'Urfé
+376,Lincoln
+377,Downtown Tampa
+378,East Carnegie
+379,Glen Oak Hills
+380,Stockyards
+381,Brentwood Village
+382,Maple Wood
+383,Lake View Hill
+384,St Peters
+385,Crafton Heights
+386,University Apartments
+387,North Valley
+388,Whiskey Island
+389,Ridgewood
+390,Collamer
+391,Park Ridge
+392,Sherman Terrace
+393,Hogg's Hollow
+394,Reston Heights
+395,Windgap
+396,Arlington
+397,Carlyon
+398,Victory Village
+399,Moore Park
+400,Stanton Heights
+401,Lenzhalde
+402,City Centre
+403,Radio Park
+404,Marbella
+405,University District
+406,Hampden
+407,Buchanan Street

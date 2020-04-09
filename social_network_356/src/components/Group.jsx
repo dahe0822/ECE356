@@ -116,7 +116,7 @@ const Group = (props) => {
       }
     };
 
-    const listOfPosts = data.posts.map(function(post) {
+    const listOfPosts = data.posts && data.posts.map(function(post) {
         const { post_id, username, title, content_body, created_at, user_read } = post;
         const read = user_read ? "read" : "X";
         return (
