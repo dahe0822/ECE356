@@ -14,3 +14,4 @@ ECE356 Project
 - user: admin
 - host: database-1.cyaj1ztyhbeh.ca-central-1.rds.amazonaws.com
 - password: ###########
+- mysql -u admin -h database-1.cyaj1ztyhbeh.ca-central-1.rds.amazonaws.com -p
