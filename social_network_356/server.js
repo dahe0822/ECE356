@@ -115,7 +115,7 @@ app.get('/api/groupPosts/:group_id/:user_id', (req, res) => {
              INNER JOIN GroupPosts ON group_id="${group_id}" AND Posts_1.post_id = GroupPosts.post_id
              INNER JOIN Users Users_1 ON Posts_1.author_id = Users_1.user_id LEFT OUTER JOIN
              UserPostRead UserPostRead_1 ON UserPostRead_1.user_id = "${user_id}" AND Posts_1.post_id = UserPostRead_1.post_id
-    WHERE (UserPostRead_1.post_id IS NULL)`;
+    WHERE (UserPostRead_1.post_id IS NULL) limit 50`;
     console.log(sql_query);
     pool.query(sql_query, function(err, result, fields) {
         if (err) throw new Error(err);

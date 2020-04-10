@@ -297,31 +297,38 @@ def comment_data():
     for fname in glob.glob(path):
         count += 1
         with open(fname, 'r', encoding="utf-8") as sourceFile:
-            with open("./sanitizedData/comment/comment{0}.csv".format(count), "w", encoding="utf-8") as outFile:
-                firstLine = True
+            with open("./sanitizedData/reaction/reaction{0}.csv".format(count), "w", encoding="utf-8") as likeFile:
+                with open("./sanitizedData/comment/comment{0}.csv".format(count), "w", encoding="utf-8") as outFile:
+                    firstLine = True
 
-                for line in sourceFile:
-                    if firstLine:
-                        outFile.write('post_id,comment,created_at,author_id\n')
-                        firstLine = False
-                        continue
-                      
-                    row_list = line.split('","')
-                    if len(row_list) > 5: continue #bad data
+                    for line in sourceFile:
+                        if firstLine:
+                            outFile.write('post_id,comment,created_at,author_id\n')
+                            likeFile.write('user_id,post_id,reaction_id,created_at\n')
+                            firstLine = False
+                            continue
+                          
+                        row_list = line.split('","')
+                        if len(row_list) > 5: continue #bad data
 
-                    comment = row_list[0][1:] if row_list[0] else ""
-                    author = row_list[-1].rstrip().replace('"','')
-                    if not author in userSet: continue
-                    postId = row_list[-2]
-                    if not postId in postSet: continue
-                    values_to_write = (postId, comment, row_list[1], author)
-                    values_to_write_st = ','.join(values_to_write)
-                    outFile.write(values_to_write_st+'\n')
+                        comment = row_list[0][1:] if row_list[0] else ""
+                        author = row_list[-1].rstrip().replace('"','')
+                        if not author in userSet: continue
+                        postId = row_list[-2]
+                        if not postId in postSet: continue
+                        values_to_write = (postId, comment, row_list[1], author)
+                        values_to_write_st = ','.join(values_to_write)
+                        outFile.write(values_to_write_st+',\n')
+
+                        values_to_write2 = (author, postId, '1', row_list[1])
+                        values_to_write_st2 = ','.join(values_to_write2)
+                        likeFile.write(values_to_write_st2+',\n')
 
 def comment_sql():
     with open("./loadComment.sql", "w", encoding="utf-8") as outFile:
         for count in range(39):
-            outFile.write("LOAD DATA LOCAL INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/sanitizedData/comment/comment"+str(count)+".csv' INTO TABLE `Comments` FIELDS TERMINATED BY ',' ENCLOSED BY '\"' ESCAPED BY '\\\\' lines terminated by '\\n' IGNORE 1 LINES (post_id,comment,created_at,author_id);\n")    
+            outFile.write("LOAD DATA LOCAL INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/sanitizedData/comment/comment"+str(count)+".csv' INTO TABLE `Comments` FIELDS TERMINATED BY ',' ENCLOSED BY '\"' ESCAPED BY '\\\\' lines terminated by '\\n' IGNORE 1 LINES (post_id,comment,created_at,author_id,@none);\n")    
+            outFile.write("LOAD DATA LOCAL INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/sanitizedData/reaction/reaction"+str(count)+".csv' INTO TABLE `PostReaction` FIELDS TERMINATED BY ',' ENCLOSED BY '\"' ESCAPED BY '\\\\' lines terminated by '\\n' IGNORE 1 LINES (user_id,post_id,reaction_id,created_at,@none);\n")    
 
 
 def main():
